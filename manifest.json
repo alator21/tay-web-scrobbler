@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Last.fm Extension",
+  "version": "1.0",
+  "permissions": [
+    "identity",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://www.last.fm/*",
+    "https://ws.audioscrobbler.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background.ts"
+  },
+  "action": {
+    "default_popup": "index.html"
+  }
+}
