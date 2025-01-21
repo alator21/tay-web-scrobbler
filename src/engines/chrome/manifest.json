@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Last.fm Extension",
+  "name": "Tay Web Scrobbler",
   "version": "1.0",
   "permissions": [
     "identity",
@@ -11,8 +11,18 @@
     "https://ws.audioscrobbler.com/*"
   ],
   "background": {
-    "service_worker": "src/background.ts"
+    "service_worker": "src/engines/chrome/background.ts"
   },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://music.youtube.com/*"
+      ],
+      "js": [
+        "src/core/sources/yt-music/content.ts"
+      ]
+    }
+  ],
   "action": {
     "default_popup": "index.html"
   }
