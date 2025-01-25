@@ -1,8 +1,11 @@
+import { type Player } from "./sources/Player";
+
 export type MessageType =
   | { type: 'AUTHENTICATE' }
   | { type: 'LOGOUT' }
-  | { type: 'SCROBBLE', artist: string, track: string, timestamp: Date }
-  | { type: 'UPDATE_NOW_PLAYING', artist: string, track: string }
+  | { type: 'PLAYER_CURRENT_STATE', player: Player }
+  | { type: 'GET_CURRENT_PLAYER_STATE' }
+  | { type: 'KEEP_ALIVE' }
   | { type: 'GET_LAST_FM_AUTH_STATUS' };
 
 export type ResponseType =
@@ -10,10 +13,10 @@ export type ResponseType =
   | { type: 'AUTHENTICATE', success: false, error: string }
   | { type: 'LOGOUT', success: true }
   | { type: 'LOGOUT', success: false, error: string }
-  | { type: 'SCROBBLE', success: true }
-  | { type: 'SCROBBLE', success: false, error: string }
-  | { type: 'UPDATE_NOW_PLAYING', success: true }
-  | { type: 'UPDATE_NOW_PLAYING', success: false, error: string }
+  | { type: 'PLAYER_CURRENT_STATE' }
+  | { type: 'GET_CURRENT_PLAYER_STATE', success: true, player: Player | undefined }
+  | { type: 'GET_CURRENT_PLAYER_STATE', success: false, error: string }
+  | { type: 'KEEP_ALIVE' }
   | { type: 'GET_LAST_FM_AUTH_STATUS', success: true, data: { sessionKey: string, user: string } | undefined }
   | { type: 'GET_LAST_FM_AUTH_STATUS', success: false, error: string };
 
@@ -29,6 +32,6 @@ export interface Communicator {
     callback: (
       message: MessageType,
       sendResponse: (response: ResponseType) => void
-    ) => void
+    ) => Promise<void>
   ): void
 }
