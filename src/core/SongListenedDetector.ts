@@ -1,7 +1,7 @@
 import { Player } from "./sources/Player";
 
 export class SongListenedDetector {
-  private readonly durationListenedThreshold: number;
+  private durationListenedThreshold: number;
   private currentSongId: string | undefined = undefined;
   private lastPosition: number = 0;
   private thresholdReached: boolean = false;
@@ -63,6 +63,13 @@ export class SongListenedDetector {
     this.thresholdReached = this.ticksSinceStart >= requiredTicks;
 
     return this.thresholdReached;
+  }
+
+  updateThreshold(durationListenedThreshold: number) {
+    if (durationListenedThreshold < 0 || durationListenedThreshold > 1) {
+      throw new Error("Threshold must be between 0 and 1");
+    }
+    this.durationListenedThreshold = durationListenedThreshold;
   }
 
 }
