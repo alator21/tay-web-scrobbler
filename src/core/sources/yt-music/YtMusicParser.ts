@@ -10,8 +10,8 @@ export class YtMusicParser implements Parser {
     return content.length > 0;
   }
   isPlaying(): boolean {
-    const songTitle = this.title();
-    return songTitle.length > 0 && document.title.startsWith(songTitle);
+    const element = queryElement(document, HTMLElement, '#play-pause-button');
+    return element.title === 'Pause'
   }
   songPosition(): number {
     return this.parseTimeInfo().current;
@@ -26,14 +26,14 @@ export class YtMusicParser implements Parser {
     return title;
   }
   artist(): string {
-    const element = queryElement(document, HTMLLinkElement, 'span.subtitle.ytmusic-player-bar>yt-formatted-string>a');
+    const element = queryElement(document, HTMLAnchorElement, 'span.subtitle.ytmusic-player-bar>yt-formatted-string>a');
     const artist = element.textContent;
     if (artist === null) { throw new ParseError() }
     return artist;
 
   }
   album(): string {
-    const element = queryElement(document, HTMLLinkElement, 'span.subtitle.style-scope.ytmusic-player-bar>yt-formatted-string>a:last-child');
+    const element = queryElement(document, HTMLAnchorElement, 'yt-formatted-string.byline.style-scope.ytmusic-player-bar > a:last-of-type');
     const album = element.textContent;
     if (album === null) { throw new ParseError() }
     return album;
