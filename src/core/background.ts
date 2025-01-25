@@ -1,6 +1,6 @@
 import { LastFmAuthenticator } from "./LastFmAuthenticator";
 import { Communicator } from "./Communicator";
-import { getSession } from "@alator21/lastfm";
+import { getSession, scrobble, updateNowPlaying } from "@alator21/lastfm";
 import { Storage } from "./Storage";
 import { SongListenedDetector } from "./SongListenedDetector";
 import { logger } from "./Logger";
@@ -53,22 +53,22 @@ export function doStuff(
             const { player } = message;
             logger.debug(`Current state of player`);
             logger.debug(player);
-            const { artist, title } = player.song;
+            const { artist, title, album, position } = player.song;
             currentSongPersistor.songTick(player);
             const songChanged = songChangedDetector.songTick(player);
             const shouldScrobbleSong = songListenedDetector.songTick(player);
             if (songChanged) {
               logger.info(`Song changed. Now playing: ${title} by ${artist}`);
-              // await updateCurrentSong(storage, artist, title);
-              // sendResponse({ type: 'PLAYER_CURRENT_STATE' });
+              await updateCurrentSong(storage, title, artist, album);
             }
             if (shouldScrobbleSong) {
               logger.info(`Scrobbling song: ${title} by ${artist}`);
-              //     await scrobbleSong(storage, artist, new Date(), title);
+              await scrobbleSong(storage, title, artist, album, getSongStartingTime(position));
             }
+            sendResponse({ type: 'PLAYER_CURRENT_STATE' });
           } catch (error) {
             logger.info(error);
-            // sendResponse({ type: 'SCROBBLE', success: false, error: `error while updating current song` });
+            sendResponse({ type: 'PLAYER_CURRENT_STATE' });
           }
           break;
         }
@@ -98,28 +98,33 @@ export function doStuff(
   }
 }
 
+function getSongStartingTime(startedSecondsBefore: number): Date {
+  const currentTime = new Date();
+  return new Date(currentTime.getTime() - startedSecondsBefore * 1000);
+}
+
 async function getLastFmSession(authenticator: LastFmAuthenticator) {
   const authToken = await authenticator.authenticate();
   const { session } = await getSession({ authToken });
   return session;
 }
 
-// async function scrobbleSong(storage: Storage, artist: string, timestamp: Date, track: string) {
-//   const sessionKey = await getSessionKeyOrThrow(storage);
-//   await scrobble({ sessionKey, artist, timestamp, track });
-// }
-//
-// async function updateCurrentSong(storage: Storage, artist: string, track: string) {
-//   const sessionKey = await getSessionKeyOrThrow(storage);
-//   await updateNowPlaying({ sessionKey, artist, track });
-// }
-//
-//
-// async function getSessionKeyOrThrow(storage: Storage) {
-//   const session = await storage.get('last_fm_session');
-//   if (session === undefined) {
-//     throw new Error('Unauthorized');
-//   }
-//   return session.session_key;
-// }
+async function scrobbleSong(storage: Storage, track: string, artist: string, album: string, timestamp: Date) {
+  const sessionKey = await getSessionKeyOrThrow(storage);
+  await scrobble({ sessionKey, artist, album, timestamp, track });
+}
+
+async function updateCurrentSong(storage: Storage, track: string, artist: string, album: string) {
+  const sessionKey = await getSessionKeyOrThrow(storage);
+  await updateNowPlaying({ sessionKey, artist, track, album });
+}
+
+
+async function getSessionKeyOrThrow(storage: Storage) {
+  const session = await storage.get('last_fm_session');
+  if (session === undefined) {
+    throw new Error('Unauthorized');
+  }
+  return session.session_key;
+}
 
