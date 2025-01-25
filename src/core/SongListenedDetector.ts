@@ -14,9 +14,9 @@ export class SongListenedDetector {
     this.durationListenedThreshold = durationListenedThreshold;
   }
 
-  songTick(state: Player): boolean {
-    const { position, totalDuration } = state.song;
-    const songId = this.getSongIdentifier(state.song);
+  songTick(player: Player): boolean {
+    const { position, totalDuration } = player.song;
+    const songId = this.getSongIdentifier(player.song);
 
     this.validatePosition(position, totalDuration);
 
