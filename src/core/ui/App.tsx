@@ -4,14 +4,14 @@ import { Communicator } from '../Communicator';
 import { LoggedOut } from './LoggedOut';
 import { LoggedIn } from './LoggedIn';
 import { Loading } from './Loading';
-import { Error } from './Error';
+import { logger } from '../Logger';
+import { Errorred } from './Errorred';
 
 type AppProps = {
   communicator: Communicator
 };
 export function App({ communicator }: AppProps) {
-  console.log(import.meta.env);
-  const [state, setState] = useState<{ status: 'loading' }
+  const [authState, setAuthState] = useState<{ status: 'loading' }
     | { status: 'loggedIn'; user: string }
     | { status: 'loggedOut' }
     | { status: 'error'; error: string }>({ status: 'loading' });
@@ -21,19 +21,19 @@ export function App({ communicator }: AppProps) {
 
   async function reloadState() {
     const response = await communicator.sendTypedMessage({ type: 'GET_LAST_FM_AUTH_STATUS' });
-    console.log({ response });
+    logger.info({ response });
     const { success } = response;
     if (!success) {
-      setState({ status: 'error', error: response.error });
+      setAuthState({ status: 'error', error: response.error });
       return;
     }
     const { data } = response;
-    console.log({ data });
+    logger.info({ data });
     if (data === undefined) {
-      setState({ status: 'loggedOut' });
+      setAuthState({ status: 'loggedOut' });
       return;
     }
-    setState({ status: 'loggedIn', user: data.user });
+    setAuthState({ status: 'loggedIn', user: data.user });
   }
 
   return (
@@ -42,10 +42,10 @@ export function App({ communicator }: AppProps) {
       <div className="w-80 p-6 bg-gray-900 text-white shadow-lg">
         <div className="space-y-6">
           <h1 className="text-2xl font-bold text-center">Tay Web Scrobbler</h1>
-          {state.status === 'error' && <Error error={state.error} />}
-          {state.status === 'loading' && <Loading />}
-          {state.status === 'loggedIn' && <LoggedIn communicator={communicator} reloadStateFn={reloadState} user={state.user} />}
-          {state.status === 'loggedOut' && <LoggedOut communicator={communicator} reloadStateFn={reloadState} />}
+          {authState.status === 'error' && <Errorred error={authState.error} />}
+          {authState.status === 'loading' && <Loading />}
+          {authState.status === 'loggedIn' && <LoggedIn communicator={communicator} reloadStateFn={reloadState} user={authState.user} />}
+          {authState.status === 'loggedOut' && <LoggedOut communicator={communicator} reloadStateFn={reloadState} />}
         </div>
       </div>
     </>
