@@ -12,6 +12,7 @@
   "dependencies": {
     "@alator21/lastfm": "npm:@jsr/alator21__lastfm",
     "@heroicons/react": "^2.2.0",
+    "loglevel": "^1.9.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
