@@ -2,8 +2,8 @@ export type Player = {
   hasSong: boolean;
   isPlaying: boolean;
   song: {
-    position: number | undefined;
-    totalDuration: number | undefined;
+    position: number;
+    totalDuration: number;
     title: string;
     artist: string;
     album: string;
