@@ -162,7 +162,7 @@ export function defaultOptions(): { scrobblingEnabled: boolean, scrobbleThreshol
   return {
     scrobblingEnabled: true,
     scrobbleThreshold: 0.7,
-    logLevel: 'off'
+    logLevel: 'silent'
   }
 }
 

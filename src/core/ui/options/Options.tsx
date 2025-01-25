@@ -44,7 +44,7 @@ export function Options({ communicator }: OptionsProps) {
             }}
             className="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="off">Off</option>
+            <option value="silent">Silent</option>
             <option value="info">Info</option>
             <option value="debug">Debug</option>
           </select>
