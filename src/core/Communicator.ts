@@ -1,3 +1,4 @@
+import { LogLevel } from "./Logger";
 import { type Player } from "./sources/Player";
 
 export type MessageType =
@@ -5,6 +6,10 @@ export type MessageType =
   | { type: 'LOGOUT' }
   | { type: 'PLAYER_CURRENT_STATE', player: Player }
   | { type: 'GET_CURRENT_PLAYER_STATE' }
+  | { type: 'GET_OPTIONS_PAGE_URL' }
+  | { type: 'GET_OPTIONS' }
+  | { type: 'SAVE_OPTIONS', options: { scrobblingEnabled: boolean, scrobbleThreshold: number, logLevel: LogLevel } }
+  | { type: 'RESET_OPTIONS_TO_DEFAULT' }
   | { type: 'KEEP_ALIVE' }
   | { type: 'GET_LAST_FM_AUTH_STATUS' };
 
@@ -14,6 +19,12 @@ export type ResponseType =
   | { type: 'LOGOUT', success: true }
   | { type: 'LOGOUT', success: false, error: string }
   | { type: 'PLAYER_CURRENT_STATE' }
+  | { type: 'GET_OPTIONS_PAGE_URL', success: true, url: string }
+  | { type: 'GET_OPTIONS', success: true, options: { scrobblingEnabled: boolean, scrobbleThreshold: number, logLevel: LogLevel } }
+  | { type: 'GET_OPTIONS', success: false, error: string }
+  | { type: 'SAVE_OPTIONS', success: true }
+  | { type: 'SAVE_OPTIONS', success: false, error: string }
+  | { type: 'RESET_OPTIONS_TO_DEFAULT', success: true }
   | { type: 'GET_CURRENT_PLAYER_STATE', success: true, player: Player | undefined }
   | { type: 'GET_CURRENT_PLAYER_STATE', success: false, error: string }
   | { type: 'KEEP_ALIVE' }

@@ -3,14 +3,16 @@ import { Communicator } from "./Communicator";
 import { getSession, scrobble, updateNowPlaying } from "@alator21/lastfm";
 import { Storage } from "./Storage";
 import { SongListenedDetector } from "./SongListenedDetector";
-import { logger } from "./Logger";
+import { logger, LogLevel } from "./Logger";
 import { SongChangedDetector } from "./SongChangedDetector";
 import { CurrentSongPersistor } from "./CurrentSongPersistor";
+import { UrlManager } from "./UrlManager";
 
 export function doStuff(
   communicator: Communicator,
   lastFmAuthenticator: LastFmAuthenticator,
   storage: Storage,
+  urlManager: UrlManager,
   songListenedDetector: SongListenedDetector,
   songChangedDetector: SongChangedDetector,
   currentSongPersistor: CurrentSongPersistor
@@ -76,6 +78,33 @@ export function doStuff(
           sendResponse({ type: 'GET_CURRENT_PLAYER_STATE', success: true, player: currentSongPersistor.getCurrentPlayer() });
           break;
         }
+        case "GET_OPTIONS_PAGE_URL": {
+          sendResponse({ type: 'GET_OPTIONS_PAGE_URL', success: true, url: urlManager.optionsUrl() });
+          break;
+        }
+        case "GET_OPTIONS": {
+          let options = await storage.get('options');
+          logger.info({ options })
+          if (options === undefined) {
+            options = defaultOptions();
+            await storage.set('options', options);
+          }
+          sendResponse({ type: 'GET_OPTIONS', success: true, options });
+          break;
+        }
+        case "SAVE_OPTIONS": {
+          const { options } = message;
+          logger.info(`Saving options`);
+          logger.info({ options })
+          await storage.set('options', options);
+          sendResponse({ type: 'SAVE_OPTIONS', success: true });
+          break;
+        }
+        case "RESET_OPTIONS_TO_DEFAULT": {
+          await storage.set('options', defaultOptions());
+          sendResponse({ type: 'RESET_OPTIONS_TO_DEFAULT', success: true });
+          break;
+        }
         case "KEEP_ALIVE": {
           sendResponse({ type: 'KEEP_ALIVE' });
           break;
@@ -128,3 +157,16 @@ async function getSessionKeyOrThrow(storage: Storage) {
   return session.session_key;
 }
 
+
+export function defaultOptions(): { scrobblingEnabled: boolean, scrobbleThreshold: number, logLevel: LogLevel } {
+  return {
+    scrobblingEnabled: true,
+    scrobbleThreshold: 0.7,
+    logLevel: 'off'
+  }
+}
+
+export async function getOptionsFromStorageOrDefault(storage: Storage) {
+  let options = await storage.get('options');
+  return options === undefined ? defaultOptions() : options;
+}
