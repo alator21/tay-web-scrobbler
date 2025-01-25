@@ -14,7 +14,7 @@ const SHARED_SECRET = import.meta.env.VITE_LAST_FM_SHARED_SECRET;
 const communicator = new ChromeCommunicator();
 const authenicator = new ChromeLastFmAuthenticator(CLIENT_ID);
 const storage = new ChromeStorage();
-const songListenedDetector = new SongListenedDetector(0.1);
+const songListenedDetector = new SongListenedDetector(0.7);
 const songChangedDetector = new SongChangedDetector();
 const currentSongPersistor = new CurrentSongPersistor(5000);
 
