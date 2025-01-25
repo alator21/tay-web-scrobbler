@@ -1,8 +1,11 @@
+import { LogLevel } from "./Logger";
+
 export interface StorageSchema {
   last_fm_session: {
     session_key: string;
     user: string;
   },
+  options: { scrobblingEnabled: boolean, scrobbleThreshold: number, logLevel: LogLevel }
 }
 
 export interface Storage {
@@ -19,5 +22,9 @@ export interface Storage {
   remove(key: keyof StorageSchema): Promise<void>
 
   removeAll(): Promise<void>;
+
+  addChangeListener<K extends keyof StorageSchema>(key: K, callback: (newValue: StorageSchema[K], oldValue: StorageSchema[K]) => void): void;
+
+  removeChangeListener<K extends keyof StorageSchema>(key: K, callback: (newValue: StorageSchema[K], oldValue: StorageSchema[K]) => void): void;
 
 }
