@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import './App.css'
+import './tailwind.css'
 import { Communicator } from '../Communicator';
 import { LoggedOut } from './LoggedOut';
 import { LoggedIn } from './LoggedIn';
