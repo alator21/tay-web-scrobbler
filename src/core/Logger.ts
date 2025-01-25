@@ -1,20 +1,17 @@
-enum LogLevel {
-  OFF = 'off',
-  INFO = 'info',
-  DEBUG = 'debug'
-}
+export type LogLevel = 'off' | 'info' | 'debug'
+
 const PREFIX = 'tay-web-scrobbler'
 class Logger {
   private currentLevel: LogLevel;
   private readonly levels: LogLevel[];
 
   constructor() {
-    this.levels = [LogLevel.OFF, LogLevel.INFO, LogLevel.DEBUG];
-    this.currentLevel = LogLevel.INFO;
+    this.levels = ['off', 'info', 'debug'];
+    this.currentLevel = 'info';
   }
 
   setLevel(level: LogLevel): void {
-    if (Object.values(LogLevel).includes(level)) {
+    if (this.levels.includes(level)) {
       this.currentLevel = level;
     } else {
       console.error(`Invalid log level: ${level}`);
@@ -32,7 +29,7 @@ class Logger {
     }
   }
   private log(level: LogLevel, message: unknown): void {
-    if (this.currentLevel === LogLevel.OFF) return;
+    if (this.currentLevel === 'off') return;
 
     const levelIndex = this.levels.indexOf(level);
     const currentLevelIndex = this.levels.indexOf(this.currentLevel);
@@ -45,17 +42,16 @@ class Logger {
   }
 
   info(message: unknown): void {
-    this.log(LogLevel.INFO, message);
+    this.log('info', message);
   }
 
   debug(message: unknown): void {
-    this.log(LogLevel.DEBUG, message);
+    this.log('debug', message);
   }
 
   isEnabled(): boolean {
-    return this.currentLevel !== LogLevel.OFF;
+    return this.currentLevel !== 'off';
   }
 }
 
 export const logger = new Logger();
-logger.setLevel(LogLevel.INFO);
