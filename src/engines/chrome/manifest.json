@@ -13,6 +13,7 @@
   "background": {
     "service_worker": "src/engines/chrome/background.ts"
   },
+  "options_page": "options.html",
   "content_scripts": [
     {
       "matches": [
