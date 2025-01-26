@@ -2,19 +2,29 @@ import { useEffect, useState } from "react";
 import { Cog6ToothIcon } from "@heroicons/react/24/solid";
 import { Communicator } from "@/core/domain/Communicator.ts";
 import { Player } from "@/core/infrastructure/sources/Player.ts";
-import { logger } from "@/core/domain/implementation/Logger.ts";
+import { logger, LogLevel } from "@/core/domain/implementation/Logger.ts";
 
 type LoggedInProps = {
   communicator: Communicator;
   reloadStateFn: () => void;
   user: string;
 };
+
 export function LoggedIn({ communicator, reloadStateFn, user }: LoggedInProps) {
   const [player, setPlayer] = useState<Player | undefined>();
   const [optionsUrl, setOptionsUrl] = useState<string | undefined>();
+  const [options, setOptions] = useState<
+    | {
+        scrobblingEnabled: boolean;
+        scrobbleThreshold: number;
+        logLevel: LogLevel;
+      }
+    | undefined
+  >(undefined);
   useEffect(() => {
     getPlayer();
     fetchOptionsUrl();
+    fetchOptions();
   }, []);
 
   async function getPlayer() {
@@ -38,6 +48,18 @@ export function LoggedIn({ communicator, reloadStateFn, user }: LoggedInProps) {
       type: "GET_OPTIONS_PAGE_URL",
     });
     setOptionsUrl(response.url);
+  }
+
+  async function fetchOptions() {
+    const response = await communicator.sendTypedMessage({
+      type: "GET_OPTIONS",
+    });
+    const { success } = response;
+    if (!success) {
+      return;
+    }
+    const { options } = response;
+    setOptions(options);
   }
 
   return (
@@ -75,24 +97,38 @@ export function LoggedIn({ communicator, reloadStateFn, user }: LoggedInProps) {
         </div>
       </div>
       {player !== undefined ? (
-        <div className="flex items-start space-x-3">
-          <img
-            src={player.song.coverUrl}
-            alt="Song cover"
-            className="w-10 h-10 object-cover rounded-md flex-shrink-0"
-          />
-          <div className="flex-grow min-w-0 space-y-1">
-            <h2 className="text-sm font-semibold truncate">
-              {player.song.title}
-            </h2>
-            <p className="text-xs text-gray-400 truncate">
-              {player.song.artist}
-            </p>
-            <p className="text-xs text-gray-500 truncate">
-              {player.song.album}
-            </p>
+        <>
+          {options !== undefined ? (
+            <div>
+              <div className="flex items-center space-x-2 mt-2">
+                <div
+                  className={`w-3 h-3 rounded-full ${options.scrobblingEnabled ? "bg-green-500" : "bg-red-500"}`}
+                ></div>
+                <span className="text-xs font-medium">
+                  {options.scrobblingEnabled ? "Scrobbling" : "Not Scrobbling"}
+                </span>
+              </div>
+            </div>
+          ) : null}
+          <div className="flex items-start space-x-3">
+            <img
+              src={player.song.coverUrl}
+              alt="Song cover"
+              className="w-10 h-10 object-cover rounded-md flex-shrink-0"
+            />
+            <div className="flex-grow min-w-0 space-y-1">
+              <h2 className="text-sm font-semibold truncate">
+                {player.song.title}
+              </h2>
+              <p className="text-xs text-gray-400 truncate">
+                {player.song.artist}
+              </p>
+              <p className="text-xs text-gray-500 truncate">
+                {player.song.album}
+              </p>
+            </div>
           </div>
-        </div>
+        </>
       ) : (
         <div className="flex items-center justify-center h-20 bg-gray-800 rounded-md">
           <p className="text-sm text-gray-400">No song currently playing</p>
