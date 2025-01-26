@@ -21,13 +21,16 @@ export default defineBackground(() => {
 
   async function main() {
     const storage = new BrowserStorage();
-    const { logLevel, scrobbleThreshold } =
+    const { logLevel, scrobblingEnabled, scrobbleThreshold } =
       await getOptionsFromStorageOrDefault(storage);
     logger.setLevel(logLevel);
     const communicator = new BrowserCommunicator();
     const lastFmAuthenticator = new BrowserLastFmAuthenticator(CLIENT_ID);
     const urlManager = new BrowserUrlManager();
-    const songListenedDetector = new SongListenedDetector(scrobbleThreshold);
+    const songListenedDetector = new SongListenedDetector(
+      scrobblingEnabled,
+      scrobbleThreshold,
+    );
     const songChangedDetector = new SongChangedDetector();
     const currentSongPersistor = new CurrentSongPersistor(5000);
 
@@ -38,6 +41,11 @@ export default defineBackground(() => {
     }) {
       const { logLevel, scrobbleThreshold } = options;
 
+      if (!scrobblingEnabled) {
+        songListenedDetector.enable();
+      } else {
+        songListenedDetector.disable();
+      }
       songListenedDetector.updateThreshold(scrobbleThreshold);
       logger.setLevel(logLevel);
     }
@@ -261,7 +269,7 @@ export function defaultOptions(): {
   return {
     scrobblingEnabled: true,
     scrobbleThreshold: 0.7,
-    logLevel: "silent",
+    logLevel: "info",
   };
 }
 

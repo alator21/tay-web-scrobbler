@@ -29,7 +29,7 @@ describe("SongListenedDetector", () => {
   let detector: SongListenedDetector;
 
   beforeEach(() => {
-    detector = new SongListenedDetector(THRESHOLD);
+    detector = new SongListenedDetector(true, THRESHOLD);
   });
 
   const createSongState = (
@@ -119,8 +119,8 @@ describe("SongListenedDetector", () => {
 
   // Error cases
   it("should throw on invalid constructor arguments", () => {
-    expect(() => new SongListenedDetector(-0.1)).toThrow();
-    expect(() => new SongListenedDetector(1.1)).toThrow();
+    expect(() => new SongListenedDetector(true, -0.1)).toThrow();
+    expect(() => new SongListenedDetector(true, 1.1)).toThrow();
   });
 
   it("should throw on invalid position values", () => {

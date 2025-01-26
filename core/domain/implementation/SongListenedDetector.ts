@@ -1,20 +1,25 @@
 import { Player } from "@/core/infrastructure/sources/Player.ts";
 
 export class SongListenedDetector {
+  private enabled: boolean;
   private durationListenedThreshold: number;
   private currentSongId: string | undefined = undefined;
   private lastPosition: number = 0;
   private thresholdReached: boolean = false;
   private ticksSinceStart: number = 0;
 
-  constructor(durationListenedThreshold: number) {
+  constructor(enabled: boolean, durationListenedThreshold: number) {
     if (durationListenedThreshold < 0 || durationListenedThreshold > 1) {
       throw new Error("Threshold must be between 0 and 1");
     }
+    this.enabled = enabled;
     this.durationListenedThreshold = durationListenedThreshold;
   }
 
   songTick(player: Player): boolean {
+    if (!this.enabled) {
+      return false;
+    }
     const { position, totalDuration } = player.song;
     const songId = this.getSongIdentifier(player.song);
 
@@ -77,5 +82,13 @@ export class SongListenedDetector {
       throw new Error("Threshold must be between 0 and 1");
     }
     this.durationListenedThreshold = durationListenedThreshold;
+  }
+
+  enable() {
+    this.enabled = true;
+  }
+
+  disable() {
+    this.enabled = false;
   }
 }
