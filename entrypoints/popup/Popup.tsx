@@ -10,7 +10,7 @@ import { logger } from "@/core/domain/implementation/Logger.ts";
 type AppProps = {
   communicator: Communicator;
 };
-export function App({ communicator }: AppProps) {
+export function Popup({ communicator }: AppProps) {
   const [authState, setAuthState] = useState<
     | { status: "loading" }
     | { status: "loggedIn"; user: string }

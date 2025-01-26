@@ -1,10 +1,10 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserCommunicator } from "@/core/domain/implementation/BrowserCommunicator.ts";
-import { App } from "./App";
+import { Popup } from "./Popup.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App communicator={new BrowserCommunicator()} />
+    <Popup communicator={new BrowserCommunicator()} />
   </StrictMode>,
 );
