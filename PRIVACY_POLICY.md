@@ -1,6 +1,6 @@
 # Privacy Policy for Tay Web Scrobbler
 
-*Last Updated: 25/01/2025*
+_Last Updated: 25/01/2025_
 
 ## Introduction
 
