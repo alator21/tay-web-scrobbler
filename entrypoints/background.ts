@@ -18,8 +18,6 @@ import { Storage } from "@/core/domain/Storage.ts";
 export default defineBackground(() => {
   const CLIENT_ID = import.meta.env.VITE_LAST_FM_API_KEY;
   const SHARED_SECRET = import.meta.env.VITE_LAST_FM_SHARED_SECRET;
-  console.log({ CLIENT_ID, SHARED_SECRET });
-  console.log(import.meta.env);
 
   async function main() {
     const storage = new BrowserStorage();
