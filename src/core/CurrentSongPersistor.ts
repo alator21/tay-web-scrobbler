@@ -9,7 +9,6 @@ export class CurrentSongPersistor {
     this.pauseThreshold = pauseThreshold;
   }
 
-
   songTick(player: Player): void {
     this.player = player;
     this.lastSongTickTime = Date.now();

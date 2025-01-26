@@ -4,14 +4,20 @@ import { queryElement } from "../utils";
 
 export class YtMusicParser implements Parser {
   hasSong(): boolean {
-    const element = queryElement(document, HTMLElement, 'yt-formatted-string.title.ytmusic-player-bar');
+    const element = queryElement(
+      document,
+      HTMLElement,
+      "yt-formatted-string.title.ytmusic-player-bar",
+    );
     const content = element.textContent;
-    if (content === null) { throw new ParseError() }
+    if (content === null) {
+      throw new ParseError();
+    }
     return content.length > 0;
   }
   isPlaying(): boolean {
-    const element = queryElement(document, HTMLElement, '#play-pause-button');
-    return element.title === 'Pause'
+    const element = queryElement(document, HTMLElement, "#play-pause-button");
+    return element.title === "Pause";
   }
   songPosition(): number {
     return this.parseTimeInfo().current;
@@ -20,39 +26,62 @@ export class YtMusicParser implements Parser {
     return this.parseTimeInfo().total;
   }
   title(): string {
-    const element = queryElement(document, HTMLElement, 'yt-formatted-string.title.ytmusic-player-bar');
+    const element = queryElement(
+      document,
+      HTMLElement,
+      "yt-formatted-string.title.ytmusic-player-bar",
+    );
     const title = element.textContent;
-    if (title === null) { throw new ParseError() }
+    if (title === null) {
+      throw new ParseError();
+    }
     return title;
   }
   artist(): string {
-    const element = queryElement(document, HTMLAnchorElement, 'span.subtitle.ytmusic-player-bar>yt-formatted-string>a');
+    const element = queryElement(
+      document,
+      HTMLAnchorElement,
+      "span.subtitle.ytmusic-player-bar>yt-formatted-string>a",
+    );
     const artist = element.textContent;
-    if (artist === null) { throw new ParseError() }
+    if (artist === null) {
+      throw new ParseError();
+    }
     return artist;
-
   }
   album(): string {
-    const element = queryElement(document, HTMLAnchorElement, 'yt-formatted-string.byline.style-scope.ytmusic-player-bar > a:last-of-type');
+    const element = queryElement(
+      document,
+      HTMLAnchorElement,
+      "yt-formatted-string.byline.style-scope.ytmusic-player-bar > a:last-of-type",
+    );
     const album = element.textContent;
-    if (album === null) { throw new ParseError() }
+    if (album === null) {
+      throw new ParseError();
+    }
     return album;
   }
   coverUrl(): string {
-    const element = queryElement(document, HTMLImageElement, 'div.thumbnail-image-wrapper.ytmusic-player-bar>img');
+    const element = queryElement(
+      document,
+      HTMLImageElement,
+      "div.thumbnail-image-wrapper.ytmusic-player-bar>img",
+    );
     return element.src;
   }
 
   private parseTimeInfo() {
-    const element = queryElement(document, HTMLSpanElement, 'span.time-info');
-    const content = element.textContent // '0:20 / 3:41'
-    if (content === null) { throw new ParseError() }
-    const timeInfo = content.split('/'); // ['0:20','3:41']
-    const rawCurrent = timeInfo[0].trim().split(':'); // ['0','20']
-    const rawTotal = timeInfo[1].trim().split(':'); // ['3','41']
+    const element = queryElement(document, HTMLSpanElement, "span.time-info");
+    const content = element.textContent; // '0:20 / 3:41'
+    if (content === null) {
+      throw new ParseError();
+    }
+    const timeInfo = content.split("/"); // ['0:20','3:41']
+    const rawCurrent = timeInfo[0].trim().split(":"); // ['0','20']
+    const rawTotal = timeInfo[1].trim().split(":"); // ['3','41']
     return {
       current: this.parseTime(rawCurrent),
-      total: this.parseTime(rawTotal)
+      total: this.parseTime(rawTotal),
     };
   }
 
@@ -71,6 +100,10 @@ export class YtMusicParser implements Parser {
       return parseInt(firstNumber) * 60 + parseInt(secondNumber);
     }
     const thirdNumber = time[2];
-    return parseInt(firstNumber) * 3600 + parseInt(secondNumber) * 60 + parseInt(thirdNumber);
+    return (
+      parseInt(firstNumber) * 3600 +
+      parseInt(secondNumber) * 60 +
+      parseInt(thirdNumber)
+    );
   }
 }

@@ -14,7 +14,8 @@ const SHARED_SECRET = import.meta.env.VITE_LAST_FM_SHARED_SECRET;
 
 async function main() {
   const storage = new ChromeStorage();
-  const { logLevel, scrobbleThreshold } = await getOptionsFromStorageOrDefault(storage);
+  const { logLevel, scrobbleThreshold } =
+    await getOptionsFromStorageOrDefault(storage);
   logger.setLevel(logLevel);
   const communicator = new ChromeCommunicator();
   const lastFmAuthenticator = new ChromeLastFmAuthenticator(CLIENT_ID);
@@ -23,25 +24,35 @@ async function main() {
   const songChangedDetector = new SongChangedDetector();
   const currentSongPersistor = new CurrentSongPersistor(5000);
 
-  function updateDependenciesBasedOnOptions(options: { scrobbleThreshold: number, scrobblingEnabled: boolean, logLevel: LogLevel }) {
+  function updateDependenciesBasedOnOptions(options: {
+    scrobbleThreshold: number;
+    scrobblingEnabled: boolean;
+    logLevel: LogLevel;
+  }) {
     const { logLevel, scrobbleThreshold } = options;
 
     songListenedDetector.updateThreshold(scrobbleThreshold);
     logger.setLevel(logLevel);
   }
 
-  logger.info('chrome/background.ts');
+  logger.info("chrome/background.ts");
   initializeLastFmApi(CLIENT_ID, SHARED_SECRET);
-  doStuff(communicator, lastFmAuthenticator, storage, urlManager, songListenedDetector, songChangedDetector, currentSongPersistor);
-
+  doStuff(
+    communicator,
+    lastFmAuthenticator,
+    storage,
+    urlManager,
+    songListenedDetector,
+    songChangedDetector,
+    currentSongPersistor,
+  );
 
   //TODO: move this to core if possible
-  storage.addChangeListener('options', (options) => {
+  storage.addChangeListener("options", (options) => {
     logger.info(`options changed`);
     logger.info(options);
     updateDependenciesBasedOnOptions(options);
   });
-
 }
 
 main();

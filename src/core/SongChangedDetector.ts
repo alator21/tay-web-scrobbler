@@ -13,7 +13,7 @@ export class SongChangedDetector {
     return false;
   }
 
-  private getSongIdentifier(song: Player['song']): string {
+  private getSongIdentifier(song: Player["song"]): string {
     return `${song.title}-${song.artist}-${song.album}`;
   }
 }

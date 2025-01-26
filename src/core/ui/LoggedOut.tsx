@@ -1,13 +1,14 @@
 import { Communicator } from "../Communicator";
 import { logger } from "../Logger";
 
-type LoggedOutProps = { communicator: Communicator, reloadStateFn: () => void };
+type LoggedOutProps = { communicator: Communicator; reloadStateFn: () => void };
 export function LoggedOut({ communicator, reloadStateFn }: LoggedOutProps) {
-
   return (
     <button
       onClick={async () => {
-        const response = await communicator.sendTypedMessage({ type: 'AUTHENTICATE' });
+        const response = await communicator.sendTypedMessage({
+          type: "AUTHENTICATE",
+        });
         logger.info({ response });
         reloadStateFn();
       }}

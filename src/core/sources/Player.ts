@@ -8,5 +8,5 @@ export type Player = {
     artist: string;
     album: string;
     coverUrl: string;
-  }
+  };
 };

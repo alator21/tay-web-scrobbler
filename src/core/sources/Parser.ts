@@ -1,11 +1,10 @@
 export interface Parser {
-
   hasSong(): boolean;
 
   isPlaying(): boolean;
 
   /*
-   * Current second(progress) of the song  [ **01:20** / 03:05 ]  
+   * Current second(progress) of the song  [ **01:20** / 03:05 ]
    * */
   songPosition(): number;
 
@@ -21,5 +20,4 @@ export interface Parser {
   album(): string;
 
   coverUrl(): string;
-
 }

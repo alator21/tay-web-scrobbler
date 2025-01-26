@@ -1,17 +1,27 @@
 import { Storage, StorageSchema } from "../../core/Storage";
 
 export class ChromeStorage implements Storage {
-  private listeners: Map<keyof StorageSchema, Set<(newValue: any, oldValue: any) => void>> = new Map();
+  private listeners: Map<
+    keyof StorageSchema,
+    Set<(newValue: any, oldValue: any) => void>
+  > = new Map();
 
-  get<K extends keyof StorageSchema>(key: K): Promise<StorageSchema[K] | undefined> {
+  get<K extends keyof StorageSchema>(
+    key: K,
+  ): Promise<StorageSchema[K] | undefined> {
     return new Promise((resolve) => {
       chrome.storage.local.get(key, (result) => {
-        if (Object.keys(result).length === 0) { resolve(undefined); }
+        if (Object.keys(result).length === 0) {
+          resolve(undefined);
+        }
         resolve(result[key] as StorageSchema[K]);
       });
     });
   }
-  set<K extends keyof StorageSchema>(key: K, value: StorageSchema[K]): Promise<void> {
+  set<K extends keyof StorageSchema>(
+    key: K,
+    value: StorageSchema[K],
+  ): Promise<void> {
     return new Promise((resolve) => {
       chrome.storage.local.set({ [key]: value }, resolve);
     });
@@ -24,15 +34,22 @@ export class ChromeStorage implements Storage {
 
   removeAll(): Promise<void> {
     return new Promise(async (resolve) => {
-      const keys = await chrome.storage.local.getKeys() as Array<keyof StorageSchema>;
-      await Promise.all(keys.map(key => {
-        return this.remove(key);
-      }))
+      const keys = (await chrome.storage.local.getKeys()) as Array<
+        keyof StorageSchema
+      >;
+      await Promise.all(
+        keys.map((key) => {
+          return this.remove(key);
+        }),
+      );
       resolve();
     });
   }
 
-  addChangeListener<K extends keyof StorageSchema>(key: K, callback: (newValue: StorageSchema[K], oldValue: StorageSchema[K]) => void): void {
+  addChangeListener<K extends keyof StorageSchema>(
+    key: K,
+    callback: (newValue: StorageSchema[K], oldValue: StorageSchema[K]) => void,
+  ): void {
     if (!this.listeners.has(key)) {
       this.listeners.set(key, new Set());
     }
@@ -43,7 +60,10 @@ export class ChromeStorage implements Storage {
     }
   }
 
-  removeChangeListener<K extends keyof StorageSchema>(key: K, callback: (newValue: StorageSchema[K], oldValue: StorageSchema[K]) => void): void {
+  removeChangeListener<K extends keyof StorageSchema>(
+    key: K,
+    callback: (newValue: StorageSchema[K], oldValue: StorageSchema[K]) => void,
+  ): void {
     const keyListeners = this.listeners.get(key);
     if (keyListeners) {
       keyListeners.delete(callback);
@@ -61,18 +81,22 @@ export class ChromeStorage implements Storage {
     chrome.storage.onChanged.addListener(this.handleStorageChange);
   }
 
-
   private teardownStorageListener(): void {
     chrome.storage.onChanged.removeListener(this.handleStorageChange);
   }
-  private handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }, areaName: string): void => {
-    if (areaName !== 'local') return;
+  private handleStorageChange = (
+    changes: { [key: string]: chrome.storage.StorageChange },
+    areaName: string,
+  ): void => {
+    if (areaName !== "local") return;
 
     for (const [key, change] of Object.entries(changes)) {
       const listeners = this.listeners.get(key as keyof StorageSchema);
       if (listeners) {
-        listeners.forEach(callback => callback(change.newValue, change.oldValue));
+        listeners.forEach((callback) =>
+          callback(change.newValue, change.oldValue),
+        );
       }
     }
-  }
+  };
 }

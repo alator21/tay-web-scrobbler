@@ -30,13 +30,15 @@ export class SongListenedDetector {
     return this.checkThreshold(totalDuration);
   }
 
-  private getSongIdentifier(song: Player['song']): string {
+  private getSongIdentifier(song: Player["song"]): string {
     return `${song.title}-${song.artist}-${song.album}`;
   }
 
   private validatePosition(position: number, totalDuration: number): void {
     if (position < 0 || position > totalDuration) {
-      throw new Error(`Invalid position: ${position} for duration ${totalDuration}`);
+      throw new Error(
+        `Invalid position: ${position} for duration ${totalDuration}`,
+      );
     }
   }
 
@@ -44,7 +46,10 @@ export class SongListenedDetector {
     return this.currentSongId !== newSongId || newPosition < this.lastPosition;
   }
 
-  private resetSongState(newSongId: string | undefined, currentPosition: number): void {
+  private resetSongState(
+    newSongId: string | undefined,
+    currentPosition: number,
+  ): void {
     this.currentSongId = newSongId;
     this.lastPosition = currentPosition;
     this.thresholdReached = false;
@@ -59,7 +64,9 @@ export class SongListenedDetector {
   private checkThreshold(totalDuration: number): boolean {
     if (this.thresholdReached) return false;
 
-    const requiredTicks = Math.ceil(totalDuration * this.durationListenedThreshold);
+    const requiredTicks = Math.ceil(
+      totalDuration * this.durationListenedThreshold,
+    );
     this.thresholdReached = this.ticksSinceStart >= requiredTicks;
 
     return this.thresholdReached;
@@ -71,5 +78,4 @@ export class SongListenedDetector {
     }
     this.durationListenedThreshold = durationListenedThreshold;
   }
-
 }

@@ -15,38 +15,61 @@ export function doStuff(
   urlManager: UrlManager,
   songListenedDetector: SongListenedDetector,
   songChangedDetector: SongChangedDetector,
-  currentSongPersistor: CurrentSongPersistor
+  currentSongPersistor: CurrentSongPersistor,
 ) {
   try {
-    logger.info('Adding typed listener');
+    logger.info("Adding typed listener");
     communicator.addTypedListener(async (message, sendResponse) => {
       switch (message.type) {
-        case 'AUTHENTICATE': {
+        case "AUTHENTICATE": {
           try {
-            const status = await storage.get('last_fm_session');
+            const status = await storage.get("last_fm_session");
             if (status !== undefined) {
-              sendResponse({ type: 'AUTHENTICATE', success: false, error: `You can't login when you are already logged in.` });
+              sendResponse({
+                type: "AUTHENTICATE",
+                success: false,
+                error: `You can't login when you are already logged in.`,
+              });
               break;
             }
             const session = await getLastFmSession(lastFmAuthenticator);
-            storage.set('last_fm_session', { session_key: session.key, user: session.name });
-            sendResponse({ type: 'AUTHENTICATE', success: true, data: { user: session.name } });
+            storage.set("last_fm_session", {
+              session_key: session.key,
+              user: session.name,
+            });
+            sendResponse({
+              type: "AUTHENTICATE",
+              success: true,
+              data: { user: session.name },
+            });
           } catch (error) {
-            sendResponse({ type: 'AUTHENTICATE', success: false, error: `error while authenticating` });
+            sendResponse({
+              type: "AUTHENTICATE",
+              success: false,
+              error: `error while authenticating`,
+            });
           }
           break;
         }
         case "LOGOUT": {
           try {
-            const status = await storage.get('last_fm_session');
+            const status = await storage.get("last_fm_session");
             if (status === undefined) {
-              sendResponse({ type: 'LOGOUT', success: false, error: `You can't logout when you are not logged in.` });
+              sendResponse({
+                type: "LOGOUT",
+                success: false,
+                error: `You can't logout when you are not logged in.`,
+              });
               break;
             }
             await storage.removeAll();
-            sendResponse({ type: 'LOGOUT', success: true });
+            sendResponse({ type: "LOGOUT", success: true });
           } catch (error) {
-            sendResponse({ type: 'LOGOUT', success: false, error: `error while logging out` });
+            sendResponse({
+              type: "LOGOUT",
+              success: false,
+              error: `error while logging out`,
+            });
           }
           break;
         }
@@ -65,64 +88,88 @@ export function doStuff(
             }
             if (shouldScrobbleSong) {
               logger.info(`Scrobbling song: ${title} by ${artist}`);
-              await scrobbleSong(storage, title, artist, album, getSongStartingTime(position));
+              await scrobbleSong(
+                storage,
+                title,
+                artist,
+                album,
+                getSongStartingTime(position),
+              );
             }
-            sendResponse({ type: 'PLAYER_CURRENT_STATE' });
+            sendResponse({ type: "PLAYER_CURRENT_STATE" });
           } catch (error) {
             logger.info(error);
-            sendResponse({ type: 'PLAYER_CURRENT_STATE' });
+            sendResponse({ type: "PLAYER_CURRENT_STATE" });
           }
           break;
         }
         case "GET_CURRENT_PLAYER_STATE": {
-          sendResponse({ type: 'GET_CURRENT_PLAYER_STATE', success: true, player: currentSongPersistor.getCurrentPlayer() });
+          sendResponse({
+            type: "GET_CURRENT_PLAYER_STATE",
+            success: true,
+            player: currentSongPersistor.getCurrentPlayer(),
+          });
           break;
         }
         case "GET_OPTIONS_PAGE_URL": {
-          sendResponse({ type: 'GET_OPTIONS_PAGE_URL', success: true, url: urlManager.optionsUrl() });
+          sendResponse({
+            type: "GET_OPTIONS_PAGE_URL",
+            success: true,
+            url: urlManager.optionsUrl(),
+          });
           break;
         }
         case "GET_OPTIONS": {
-          let options = await storage.get('options');
-          logger.info({ options })
+          let options = await storage.get("options");
+          logger.info({ options });
           if (options === undefined) {
             options = defaultOptions();
-            await storage.set('options', options);
+            await storage.set("options", options);
           }
-          sendResponse({ type: 'GET_OPTIONS', success: true, options });
+          sendResponse({ type: "GET_OPTIONS", success: true, options });
           break;
         }
         case "SAVE_OPTIONS": {
           const { options } = message;
           logger.info(`Saving options`);
-          logger.info({ options })
-          await storage.set('options', options);
-          sendResponse({ type: 'SAVE_OPTIONS', success: true });
+          logger.info({ options });
+          await storage.set("options", options);
+          sendResponse({ type: "SAVE_OPTIONS", success: true });
           break;
         }
         case "RESET_OPTIONS_TO_DEFAULT": {
-          await storage.set('options', defaultOptions());
-          sendResponse({ type: 'RESET_OPTIONS_TO_DEFAULT', success: true });
+          await storage.set("options", defaultOptions());
+          sendResponse({ type: "RESET_OPTIONS_TO_DEFAULT", success: true });
           break;
         }
         case "KEEP_ALIVE": {
-          sendResponse({ type: 'KEEP_ALIVE' });
+          sendResponse({ type: "KEEP_ALIVE" });
           break;
         }
-        case 'GET_LAST_FM_AUTH_STATUS': {
+        case "GET_LAST_FM_AUTH_STATUS": {
           try {
-            const status = await storage.get('last_fm_session');
+            const status = await storage.get("last_fm_session");
             logger.debug({ status });
-            sendResponse({ type: 'GET_LAST_FM_AUTH_STATUS', success: true, data: status !== undefined ? { sessionKey: status.session_key, user: status.user } : undefined });
+            sendResponse({
+              type: "GET_LAST_FM_AUTH_STATUS",
+              success: true,
+              data:
+                status !== undefined
+                  ? { sessionKey: status.session_key, user: status.user }
+                  : undefined,
+            });
           } catch (error) {
-            sendResponse({ type: 'GET_LAST_FM_AUTH_STATUS', success: false, error: `error while getting status` });
+            sendResponse({
+              type: "GET_LAST_FM_AUTH_STATUS",
+              success: false,
+              error: `error while getting status`,
+            });
           }
           break;
         }
       }
     });
-  }
-  catch (error) {
+  } catch (error) {
     logger.info(error);
   }
 }
@@ -138,35 +185,48 @@ async function getLastFmSession(authenticator: LastFmAuthenticator) {
   return session;
 }
 
-async function scrobbleSong(storage: Storage, track: string, artist: string, album: string, timestamp: Date) {
+async function scrobbleSong(
+  storage: Storage,
+  track: string,
+  artist: string,
+  album: string,
+  timestamp: Date,
+) {
   const sessionKey = await getSessionKeyOrThrow(storage);
   await scrobble({ sessionKey, artist, album, timestamp, track });
 }
 
-async function updateCurrentSong(storage: Storage, track: string, artist: string, album: string) {
+async function updateCurrentSong(
+  storage: Storage,
+  track: string,
+  artist: string,
+  album: string,
+) {
   const sessionKey = await getSessionKeyOrThrow(storage);
   await updateNowPlaying({ sessionKey, artist, track, album });
 }
 
-
 async function getSessionKeyOrThrow(storage: Storage) {
-  const session = await storage.get('last_fm_session');
+  const session = await storage.get("last_fm_session");
   if (session === undefined) {
-    throw new Error('Unauthorized');
+    throw new Error("Unauthorized");
   }
   return session.session_key;
 }
 
-
-export function defaultOptions(): { scrobblingEnabled: boolean, scrobbleThreshold: number, logLevel: LogLevel } {
+export function defaultOptions(): {
+  scrobblingEnabled: boolean;
+  scrobbleThreshold: number;
+  logLevel: LogLevel;
+} {
   return {
     scrobblingEnabled: true,
     scrobbleThreshold: 0.7,
-    logLevel: 'silent'
-  }
+    logLevel: "silent",
+  };
 }
 
 export async function getOptionsFromStorageOrDefault(storage: Storage) {
-  let options = await storage.get('options');
+  let options = await storage.get("options");
   return options === undefined ? defaultOptions() : options;
 }
