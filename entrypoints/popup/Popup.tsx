@@ -10,6 +10,7 @@ import { logger } from "@/core/domain/implementation/Logger.ts";
 type AppProps = {
   communicator: Communicator;
 };
+
 export function Popup({ communicator }: AppProps) {
   const [authState, setAuthState] = useState<
     | { status: "loading" }
@@ -44,7 +45,16 @@ export function Popup({ communicator }: AppProps) {
     <>
       <div className="w-80 p-6 bg-gray-900 text-white shadow-lg">
         <div className="space-y-6">
-          <h1 className="text-2xl font-bold text-center">Tay Web Scrobbler</h1>
+          <div className="flex items-center justify-center space-x-2 mb-4">
+            <img
+              src="/icon/32.png"
+              alt="Tay Web Scrobbler - Logo"
+              className="w-8 h-8"
+            />
+            <h1 className="text-2xl font-bold text-center">
+              Tay Web Scrobbler
+            </h1>
+          </div>
           {authState.status === "error" && <Errorred error={authState.error} />}
           {authState.status === "loading" && <Loading />}
           {authState.status === "loggedIn" && (
