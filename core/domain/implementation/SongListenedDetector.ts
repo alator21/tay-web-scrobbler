@@ -84,11 +84,7 @@ export class SongListenedDetector {
     this.durationListenedThreshold = durationListenedThreshold;
   }
 
-  enable() {
-    this.enabled = true;
-  }
-
-  disable() {
-    this.enabled = false;
+  modifyEnabledStatus(enabled: boolean): void {
+    this.enabled = enabled;
   }
 }
