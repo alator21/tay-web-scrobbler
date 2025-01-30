@@ -1,11 +1,10 @@
 import { ResponseType } from "@/core/domain/Communicator.ts";
-import { Storage } from "@/core/domain/Storage.ts";
 import { defaultOptions } from "./common.ts";
+import { Storage } from "@/core/domain/Storage.ts";
 
 export async function resetOptionsToDefault(
   storage: Storage,
-  sendResponse: (response: ResponseType) => void,
-) {
+): Promise<Extract<ResponseType, { type: "RESET_OPTIONS_TO_DEFAULT" }>> {
   await storage.set("options", defaultOptions());
-  sendResponse({ type: "RESET_OPTIONS_TO_DEFAULT", success: true });
+  return { type: "RESET_OPTIONS_TO_DEFAULT", success: true };
 }

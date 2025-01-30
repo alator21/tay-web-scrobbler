@@ -1,15 +1,22 @@
-import { LogLevel } from "./implementation/Logger.ts";
+import { Player } from "@/core/sources/Player.ts";
+import { LogLevelDesc } from "loglevel";
+
+export type StorageOptions = {
+  scrobblingEnabled: boolean;
+  scrobbleThreshold: number;
+  logLevel: LogLevelDesc;
+};
 
 export interface StorageSchema {
   last_fm_session: {
     session_key: string;
     user: string;
   };
-  options: {
-    scrobblingEnabled: boolean;
-    scrobbleThreshold: number;
-    logLevel: LogLevel;
+  current_player: {
+    player: Player | undefined;
+    lastSongTickTime: number;
   };
+  options: StorageOptions;
 }
 
 export interface Storage {

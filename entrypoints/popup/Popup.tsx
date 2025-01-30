@@ -4,14 +4,10 @@ import { LoggedOut } from "./LoggedOut";
 import { LoggedIn } from "./LoggedIn";
 import { Loading } from "./Loading";
 import { Errorred } from "./Errorred";
-import { Communicator } from "@/core/domain/Communicator.ts";
-import { logger } from "@/core/domain/implementation/Logger.ts";
+import { getLastFmAuthStatus } from "@/core/actions/getLastFmAuthStatus.ts";
+import { logger, storage } from "@/core/dependencies/popup.ts";
 
-type AppProps = {
-  communicator: Communicator;
-};
-
-export function Popup({ communicator }: AppProps) {
+export function Popup() {
   const [authState, setAuthState] = useState<
     | { status: "loading" }
     | { status: "loggedIn"; user: string }
@@ -23,9 +19,7 @@ export function Popup({ communicator }: AppProps) {
   }, []);
 
   async function reloadState() {
-    const response = await communicator.sendTypedMessage({
-      type: "GET_LAST_FM_AUTH_STATUS",
-    });
+    const response = await getLastFmAuthStatus(logger, storage);
     logger.info({ response });
     const { success } = response;
     if (!success) {
@@ -58,17 +52,10 @@ export function Popup({ communicator }: AppProps) {
           {authState.status === "error" && <Errorred error={authState.error} />}
           {authState.status === "loading" && <Loading />}
           {authState.status === "loggedIn" && (
-            <LoggedIn
-              communicator={communicator}
-              reloadStateFn={reloadState}
-              user={authState.user}
-            />
+            <LoggedIn reloadStateFn={reloadState} user={authState.user} />
           )}
           {authState.status === "loggedOut" && (
-            <LoggedOut
-              communicator={communicator}
-              reloadStateFn={reloadState}
-            />
+            <LoggedOut reloadStateFn={reloadState} />
           )}
         </div>
       </div>

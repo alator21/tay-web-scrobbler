@@ -1,37 +1,39 @@
 import { useEffect, useState } from "react";
 import { Cog6ToothIcon } from "@heroicons/react/24/solid";
-import { Communicator } from "@/core/domain/Communicator.ts";
-import { Player } from "@/core/infrastructure/sources/Player.ts";
-import { logger, LogLevel } from "@/core/domain/implementation/Logger.ts";
+import { Player } from "@/core/sources/Player.ts";
+import { getOptionsPageUrl } from "@/core/actions/getOptionsPageUrl.ts";
+import { getOptions } from "@/core/actions/getOptions.ts";
+import { logout } from "@/core/actions/logout.ts";
+import { getPlayerCurrentState } from "@/core/actions/getPlayerCurrentState.ts";
+import {
+  logger,
+  urlManager,
+  storage,
+  currentSongPersistor,
+} from "@/core/dependencies/popup.ts";
+import { StorageOptions } from "@/core/domain/Storage.ts";
 
 type LoggedInProps = {
-  communicator: Communicator;
   reloadStateFn: () => void;
   user: string;
 };
 
-export function LoggedIn({ communicator, reloadStateFn, user }: LoggedInProps) {
+export function LoggedIn({ reloadStateFn, user }: LoggedInProps) {
+  console.log("LoggedIn");
   const [player, setPlayer] = useState<Player | undefined>();
   const [optionsUrl, setOptionsUrl] = useState<string | undefined>();
-  const [options, setOptions] = useState<
-    | {
-        scrobblingEnabled: boolean;
-        scrobbleThreshold: number;
-        logLevel: LogLevel;
-      }
-    | undefined
-  >(undefined);
+  const [options, setOptions] = useState<StorageOptions | undefined>(undefined);
   useEffect(() => {
+    console.log("getting player current state");
     getPlayer();
     fetchOptionsUrl();
     fetchOptions();
   }, []);
 
   async function getPlayer() {
-    const response = await communicator.sendTypedMessage({
-      type: "GET_CURRENT_PLAYER_STATE",
-    });
+    const response = await getPlayerCurrentState(logger, currentSongPersistor);
     logger.info({ response });
+    console.log(response);
     const { success } = response;
     if (!success) {
       setPlayer(undefined);
@@ -44,16 +46,12 @@ export function LoggedIn({ communicator, reloadStateFn, user }: LoggedInProps) {
   }
 
   async function fetchOptionsUrl() {
-    const response = await communicator.sendTypedMessage({
-      type: "GET_OPTIONS_PAGE_URL",
-    });
+    const response = await getOptionsPageUrl(urlManager);
     setOptionsUrl(response.url);
   }
 
   async function fetchOptions() {
-    const response = await communicator.sendTypedMessage({
-      type: "GET_OPTIONS",
-    });
+    const response = await getOptions(logger, storage);
     const { success } = response;
     if (!success) {
       return;
@@ -87,7 +85,7 @@ export function LoggedIn({ communicator, reloadStateFn, user }: LoggedInProps) {
           )}
           <button
             onClick={async () => {
-              await communicator.sendTypedMessage({ type: "LOGOUT" });
+              await logout(logger, storage);
               reloadStateFn();
             }}
             className="py-1 px-3 bg-red-600 hover:bg-red-700 transition-colors duration-200 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"

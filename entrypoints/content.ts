@@ -1,16 +1,24 @@
-import { logger } from "@/core/domain/implementation/Logger.ts";
-import { YtMusicParser } from "@/core/infrastructure/sources/yt-music/YtMusicParser.ts";
-import { BrowserCommunicator } from "@/core/domain/implementation/BrowserCommunicator.ts";
-import { Communicator } from "@/core/domain/Communicator.ts";
+import { YtMusicParser } from "@/core/sources/yt-music/YtMusicParser.ts";
+import { playerCurrentState } from "@/core/actions/playerCurrentState.ts";
+import {
+  logger,
+  storage,
+  currentSongPersistor,
+  songChangedDetector,
+  songListenedDetector,
+} from "@/core/dependencies/content.ts";
+import { Parser } from "@/core/sources/Parser.ts";
+import { timeTick } from "@/core/actions/timeTick.ts";
 
 export default defineContentScript({
   matches: ["*://music.youtube.com/*"],
   main() {
     logger.info("content.ts");
-    const parser = new YtMusicParser();
-    const communicator = new BrowserCommunicator();
+    const SONG_TICK_INTERVAL_MS = 1000;
 
-    function sendCurrentPlayer(communicator: Communicator) {
+    const parser: Parser = new YtMusicParser();
+
+    async function sendCurrentPlayer() {
       try {
         const player = {
           hasSong: parser.hasSong(),
@@ -28,21 +36,27 @@ export default defineContentScript({
         if (!player.isPlaying) {
           return;
         }
-        communicator.sendTypedMessage({ type: "PLAYER_CURRENT_STATE", player });
+        await playerCurrentState(
+          logger,
+          storage,
+          currentSongPersistor,
+          songChangedDetector,
+          songListenedDetector,
+          player,
+        );
       } catch (error) {
         logger.info("got an error in content");
         logger.info({ error });
       }
     }
 
-    setInterval(() => {
-      logger.debug("keep alive");
-      communicator.sendTypedMessage({ type: "KEEP_ALIVE" });
-    }, 20000);
-
-    setInterval(() => {
+    setInterval(async () => {
       logger.debug("interval");
-      sendCurrentPlayer(communicator);
-    }, 1000);
+      await sendCurrentPlayer();
+    }, SONG_TICK_INTERVAL_MS);
+
+    setInterval(async () => {
+      await timeTick(currentSongPersistor, storage);
+    }, SONG_TICK_INTERVAL_MS);
   },
 });

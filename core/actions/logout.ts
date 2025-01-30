@@ -1,29 +1,28 @@
-import { logger } from "@/core/domain/implementation/Logger.ts";
-import { Storage } from "@/core/domain/Storage.ts";
 import { ResponseType } from "@/core/domain/Communicator.ts";
+import { Logger } from "loglevel";
+import { Storage } from "@/core/domain/Storage.ts";
 
 export async function logout(
+  logger: Logger,
   storage: Storage,
-  sendResponse: (response: ResponseType) => void,
-) {
+): Promise<Extract<ResponseType, { type: "LOGOUT" }>> {
   try {
     const status = await storage.get("last_fm_session");
     if (status === undefined) {
-      sendResponse({
+      return {
         type: "LOGOUT",
         success: false,
         error: `You can't logout when you are not logged in.`,
-      });
-      return;
+      };
     }
     await storage.removeAll();
-    sendResponse({ type: "LOGOUT", success: true });
+    return { type: "LOGOUT", success: true };
   } catch (error) {
     logger.error(error);
-    sendResponse({
+    return {
       type: "LOGOUT",
       success: false,
       error: `error while logging out`,
-    });
+    };
   }
 }

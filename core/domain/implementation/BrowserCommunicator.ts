@@ -8,10 +8,15 @@ export class BrowserCommunicator implements Communicator {
     logger.debug(message);
     return new Promise((resolve) => {
       browser.runtime.sendMessage(message, (response: ResponseType) => {
+        // if (browser.runtime.lastError) {
+        //   logger.error(`GOt error`);
+        //   logger.error(browser.runtime.lastError);
+        // }
         resolve(response as Extract<ResponseType, { type: T["type"] }>);
       });
     });
   }
+
   addTypedListener(
     callback: (
       message: MessageType,

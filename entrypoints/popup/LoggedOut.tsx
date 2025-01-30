@@ -1,14 +1,21 @@
-import { Communicator } from "@/core/domain/Communicator.ts";
-import { logger } from "@/core/domain/implementation/Logger.ts";
+import { authenticate } from "@/core/actions/authenticate.ts";
+import {
+  lastFmAuthenticator,
+  logger,
+  storage,
+} from "@/core/dependencies/popup.ts";
 
-type LoggedOutProps = { communicator: Communicator; reloadStateFn: () => void };
-export function LoggedOut({ communicator, reloadStateFn }: LoggedOutProps) {
+type LoggedOutProps = { reloadStateFn: () => void };
+
+export function LoggedOut({ reloadStateFn }: LoggedOutProps) {
   return (
     <button
       onClick={async () => {
-        const response = await communicator.sendTypedMessage({
-          type: "AUTHENTICATE",
-        });
+        const response = await authenticate(
+          logger,
+          lastFmAuthenticator,
+          storage,
+        );
         logger.info({ response });
         reloadStateFn();
       }}

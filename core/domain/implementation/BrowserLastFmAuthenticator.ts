@@ -1,4 +1,4 @@
-import { LastFmAuthenticator } from "./LastFmAuthenticator.ts";
+import { LastFmAuthenticator } from "../LastFmAuthenticator.ts";
 
 export class BrowserLastFmAuthenticator implements LastFmAuthenticator {
   private static readonly LAST_FM_AUTH_URL = "https://www.last.fm/api/auth/";

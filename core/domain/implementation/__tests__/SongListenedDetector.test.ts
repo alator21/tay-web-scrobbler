@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "bun:test";
 import { SongListenedDetector } from "../SongListenedDetector.ts";
-import { Player } from "@/core/infrastructure/sources/Player.ts";
+import { Player } from "@/core/sources/Player.ts";
 
 type Song = {
   title: string;

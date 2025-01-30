@@ -1,20 +1,13 @@
 import { useEffect, useState } from "react";
 import "./tailwind.css";
-import { Communicator } from "@/core/domain/Communicator.ts";
-import { logger, LogLevel } from "@/core/domain/implementation/Logger.ts";
+import { getOptions } from "@/core/actions/getOptions.ts";
+import { resetOptionsToDefault } from "@/core/actions/resetOptionsToDefault.ts";
+import { saveOptions } from "@/core/actions/saveOptions.ts";
+import { logger, storage } from "@/core/dependencies/options";
+import { StorageOptions } from "@/core/domain/Storage.ts";
 
-type OptionsProps = {
-  communicator: Communicator;
-};
-export function Options({ communicator }: OptionsProps) {
-  const [options, setOptions] = useState<
-    | {
-        scrobblingEnabled: boolean;
-        scrobbleThreshold: number;
-        logLevel: LogLevel;
-      }
-    | undefined
-  >(undefined);
+export function Options() {
+  const [options, setOptions] = useState<StorageOptions | undefined>(undefined);
   const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
@@ -22,9 +15,7 @@ export function Options({ communicator }: OptionsProps) {
   }, []);
 
   async function fetchOptions() {
-    const response = await communicator.sendTypedMessage({
-      type: "GET_OPTIONS",
-    });
+    const response = await getOptions(logger, storage);
     const { success } = response;
     if (!success) {
       return;
@@ -55,7 +46,7 @@ export function Options({ communicator }: OptionsProps) {
               onChange={async (event) => {
                 setOptions({
                   ...options,
-                  logLevel: event.target.value as LogLevel,
+                  logLevel: event.target.value as StorageOptions["logLevel"],
                 });
                 setHasChanges(true);
               }}
@@ -131,9 +122,7 @@ export function Options({ communicator }: OptionsProps) {
             <div className="flex justify-between space-x-2">
               <button
                 onClick={async () => {
-                  const response = await communicator.sendTypedMessage({
-                    type: "RESET_OPTIONS_TO_DEFAULT",
-                  });
+                  const response = await resetOptionsToDefault(storage);
                   logger.debug(response);
                   await fetchOptions();
                   setHasChanges(false);
@@ -142,24 +131,10 @@ export function Options({ communicator }: OptionsProps) {
               >
                 Reset to Defaults
               </button>
-
-              {/* <button */}
-              {/*   onClick={async () => { */}
-              {/*     await fetchOptions(); */}
-              {/*     setHasChanges(false) */}
-              {/*   }} */}
-              {/*   disabled={!hasChanges} */}
-              {/*   className="flex-1 py-2 px-4 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:cursor-not-allowed text-white rounded-md transition-colors text-sm" */}
-              {/* > */}
-              {/*   Discard changes(Fetch previous saved ones) */}
-              {/* </button> */}
             </div>
             <button
               onClick={async () => {
-                const response = await communicator.sendTypedMessage({
-                  type: "SAVE_OPTIONS",
-                  options,
-                });
+                const response = await saveOptions(logger, storage, options);
                 logger.info(response);
                 setHasChanges(false);
               }}

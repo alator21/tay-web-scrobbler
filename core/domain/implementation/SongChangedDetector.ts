@@ -1,4 +1,4 @@
-import { Player } from "@/core/infrastructure/sources/Player.ts";
+import { Player } from "@/core/sources/Player.ts";
 
 export class SongChangedDetector {
   private currentSongId: string | undefined = undefined;

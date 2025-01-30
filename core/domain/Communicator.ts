@@ -1,5 +1,5 @@
-import { LogLevel } from "./implementation/Logger.ts";
-import { type Player } from "@/core/infrastructure/sources/Player.ts";
+import { type Player } from "@/core/sources/Player.ts";
+import { StorageOptions } from "@/core/domain/Storage.ts";
 
 export type MessageType =
   | { type: "AUTHENTICATE" }
@@ -10,13 +10,10 @@ export type MessageType =
   | { type: "GET_OPTIONS" }
   | {
       type: "SAVE_OPTIONS";
-      options: {
-        scrobblingEnabled: boolean;
-        scrobbleThreshold: number;
-        logLevel: LogLevel;
-      };
+      options: StorageOptions;
     }
   | { type: "RESET_OPTIONS_TO_DEFAULT" }
+  | { type: "TIME_TICK" }
   | { type: "KEEP_ALIVE" }
   | { type: "GET_LAST_FM_AUTH_STATUS" };
 
@@ -30,11 +27,7 @@ export type ResponseType =
   | {
       type: "GET_OPTIONS";
       success: true;
-      options: {
-        scrobblingEnabled: boolean;
-        scrobbleThreshold: number;
-        logLevel: LogLevel;
-      };
+      options: StorageOptions;
     }
   | { type: "GET_OPTIONS"; success: false; error: string }
   | { type: "SAVE_OPTIONS"; success: true }
@@ -46,6 +39,7 @@ export type ResponseType =
       player: Player | undefined;
     }
   | { type: "GET_CURRENT_PLAYER_STATE"; success: false; error: string }
+  | { type: "TIME_TICK"; success: true }
   | { type: "KEEP_ALIVE" }
   | {
       type: "GET_LAST_FM_AUTH_STATUS";
@@ -53,16 +47,3 @@ export type ResponseType =
       data: { sessionKey: string; user: string } | undefined;
     }
   | { type: "GET_LAST_FM_AUTH_STATUS"; success: false; error: string };
-
-export interface Communicator {
-  sendTypedMessage<T extends MessageType>(
-    message: T,
-  ): Promise<Extract<ResponseType, { type: T["type"] }>>;
-
-  addTypedListener(
-    callback: (
-      message: MessageType,
-      sendResponse: (response: ResponseType) => void,
-    ) => Promise<void>,
-  ): void;
-}
