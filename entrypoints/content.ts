@@ -56,7 +56,7 @@ export default defineContentScript({
     }, SONG_TICK_INTERVAL_MS);
 
     setInterval(async () => {
-      await timeTick(currentSongPersistor, storage);
+      await timeTick(logger, currentSongPersistor, storage);
     }, SONG_TICK_INTERVAL_MS);
   },
 });
