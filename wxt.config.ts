@@ -12,7 +12,7 @@ export default defineConfig({
   manifestVersion: 3,
   manifest: {
     name: "Tay Web Scrobbler",
-    description: "Tay Web Scrobbler",
+    description: "Last.fm scrobbler for YT music",
     version: `${build.version}`,
     permissions: ["identity", "storage"],
     host_permissions: [
