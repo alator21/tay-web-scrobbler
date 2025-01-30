@@ -1,5 +1,6 @@
 import { defineConfig } from "wxt";
 import tailwindcss from "@tailwindcss/vite";
+import build from "./BUILD.json";
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
@@ -11,7 +12,8 @@ export default defineConfig({
   manifestVersion: 3,
   manifest: {
     name: "Tay Web Scrobbler",
-    version: "0.0.1",
+    description: "Tay Web Scrobbler",
+    version: `${build.version}`,
     permissions: ["identity", "storage"],
     host_permissions: [
       "https://www.last.fm/*",
