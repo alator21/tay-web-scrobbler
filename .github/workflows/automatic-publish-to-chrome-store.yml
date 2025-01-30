@@ -1,0 +1,40 @@
+name: Automatic Publish to Chrome store
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'BUILD.json'
+
+jobs:
+  submit:
+    if: false  # Disabled for now - to be tested
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v1
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Update build time
+        run: ./scripts/update-build-time.ts
+
+      - name: Zip extensions
+        run: |
+          bun zip
+
+      - name: Submit to stores
+        run: |
+          bun wxt submit \
+            --chrome-zip .output/*-chrome.zip
+        env:
+          VITE_LAST_FM_API_KEY: ${{ secrets.LAST_FM_API_KEY }}
+          VITE_LAST_FM_SHARED_SECRET: ${{ secrets.LAST_FM_SHARED_SECRET }}
+          CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          CHROME_SKIP_SUBMIT_REVIEW: ${{ vars.CHROME_SKIP_SUBMIT_REVIEW }}
