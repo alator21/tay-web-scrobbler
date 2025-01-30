@@ -78,7 +78,6 @@ export class SongListenedDetector {
   }
 
   updateThreshold(durationListenedThreshold: number) {
-    console.log("Changing threshold", durationListenedThreshold);
     if (durationListenedThreshold < 0 || durationListenedThreshold > 1) {
       throw new Error("Threshold must be between 0 and 1");
     }

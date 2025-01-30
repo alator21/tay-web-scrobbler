@@ -5,12 +5,7 @@ import { getOptionsPageUrl } from "@/core/actions/getOptionsPageUrl.ts";
 import { getOptions } from "@/core/actions/getOptions.ts";
 import { logout } from "@/core/actions/logout.ts";
 import { getPlayerCurrentState } from "@/core/actions/getPlayerCurrentState.ts";
-import {
-  logger,
-  urlManager,
-  storage,
-  currentSongPersistor,
-} from "@/core/dependencies/popup.ts";
+import { logger, urlManager, storage } from "@/core/dependencies/popup.ts";
 import { StorageOptions } from "@/core/domain/Storage.ts";
 
 type LoggedInProps = {
@@ -19,21 +14,19 @@ type LoggedInProps = {
 };
 
 export function LoggedIn({ reloadStateFn, user }: LoggedInProps) {
-  console.log("LoggedIn");
+  logger.info("LoggedIn");
   const [player, setPlayer] = useState<Player | undefined>();
   const [optionsUrl, setOptionsUrl] = useState<string | undefined>();
   const [options, setOptions] = useState<StorageOptions | undefined>(undefined);
   useEffect(() => {
-    console.log("getting player current state");
     getPlayer();
     fetchOptionsUrl();
     fetchOptions();
   }, []);
 
   async function getPlayer() {
-    const response = await getPlayerCurrentState(logger, currentSongPersistor);
+    const response = await getPlayerCurrentState(logger);
     logger.info({ response });
-    console.log(response);
     const { success } = response;
     if (!success) {
       setPlayer(undefined);

@@ -21,8 +21,6 @@ export async function playerCurrentState(
     const { artist, title, album, position } = player.song;
     logger.info(currentSongPersistor);
     currentSongPersistor.songTick(player);
-    console.log("setting storage");
-    console.log(currentSongPersistor.player);
     await storage.set("current_player", {
       player: currentSongPersistor.player,
       lastSongTickTime: Date.now(),
