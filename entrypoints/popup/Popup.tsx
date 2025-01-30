@@ -6,6 +6,7 @@ import { Loading } from "./Loading";
 import { Errorred } from "./Errorred";
 import { getLastFmAuthStatus } from "@/core/actions/getLastFmAuthStatus.ts";
 import { logger, storage } from "@/core/dependencies/popup.ts";
+import { Version } from "@/entrypoints/popup/Version.tsx";
 
 export function Popup() {
   const [authState, setAuthState] = useState<
@@ -57,6 +58,7 @@ export function Popup() {
           {authState.status === "loggedOut" && (
             <LoggedOut reloadStateFn={reloadState} />
           )}
+          <Version />
         </div>
       </div>
     </>
