@@ -19,7 +19,6 @@ export async function playerCurrentState(
     logger.debug(`Current state of player`);
     logger.debug(player);
     const { artist, title, album, position } = player.song;
-    logger.info(currentSongPersistor);
     currentSongPersistor.songTick(player);
     await storage.set("current_player", {
       player: currentSongPersistor.player,
