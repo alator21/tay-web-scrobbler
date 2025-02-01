@@ -5,11 +5,11 @@ on:
     branches:
       - master
     paths:
-      - 'BUILD.json'
+      - "BUILD.json"
 
 jobs:
   submit:
-    if: false  # Disabled for now - to be tested
+    if: false # Disabled for now - to be tested
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
