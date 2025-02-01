@@ -19,7 +19,7 @@ export async function authenticate(
       };
     }
     const session = await getLastFmSession(lastFmAuthenticator);
-    storage.set("last_fm_session", {
+    await storage.set("last_fm_session", {
       session_key: session.key,
       user: session.name,
     });
