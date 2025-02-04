@@ -15,7 +15,10 @@ export async function logout(
         error: `You can't logout when you are not logged in.`,
       };
     }
-    await storage.removeAll();
+    await Promise.all([
+      storage.remove("last_fm_session"),
+      storage.remove("current_player"),
+    ]);
     return { type: "LOGOUT", success: true };
   } catch (error) {
     logger.error(error);
