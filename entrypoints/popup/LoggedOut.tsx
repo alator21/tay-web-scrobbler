@@ -1,9 +1,4 @@
-import { authenticate } from "@/core/actions/authenticate.ts";
-import {
-  lastFmAuthenticator,
-  logger,
-  storage,
-} from "@/core/dependencies/popup.ts";
+import { communicator, logger } from "@/core/dependencies/popup.ts";
 
 type LoggedOutProps = { reloadStateFn: () => void };
 
@@ -11,11 +6,9 @@ export function LoggedOut({ reloadStateFn }: LoggedOutProps) {
   return (
     <button
       onClick={async () => {
-        const response = await authenticate(
-          logger,
-          lastFmAuthenticator,
-          storage,
-        );
+        const response = await communicator.sendTypedMessage({
+          type: "AUTHENTICATE",
+        });
         logger.info({ response });
         reloadStateFn();
       }}
