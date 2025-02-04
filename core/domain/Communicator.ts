@@ -47,3 +47,16 @@ export type ResponseType =
       data: { sessionKey: string; user: string } | undefined;
     }
   | { type: "GET_LAST_FM_AUTH_STATUS"; success: false; error: string };
+
+export interface Communicator {
+  sendTypedMessage<T extends MessageType>(
+    message: T,
+  ): Promise<Extract<ResponseType, { type: T["type"] }>>;
+
+  addTypedListener(
+    callback: (
+      message: MessageType,
+      sendResponse: (response: ResponseType) => void,
+    ) => Promise<void>,
+  ): void;
+}
