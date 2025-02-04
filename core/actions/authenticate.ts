@@ -9,8 +9,12 @@ export async function authenticate(
   lastFmAuthenticator: LastFmAuthenticator,
   storage: Storage,
 ): Promise<Extract<ResponseType, { type: "AUTHENTICATE" }>> {
+  logger.info("Starting authentication...");
   try {
     const status = await storage.get("last_fm_session");
+    logger.info(
+      `Status is ${status === undefined ? "undefined" : JSON.stringify(status)}`,
+    );
     if (status !== undefined) {
       return {
         type: "AUTHENTICATE",
@@ -18,11 +22,14 @@ export async function authenticate(
         error: `You can't login when you are already logged in.`,
       };
     }
-    const session = await getLastFmSession(lastFmAuthenticator);
+    logger.info(`Getting session...`);
+    const session = await getLastFmSession(logger, lastFmAuthenticator);
+    logger.info(`Session is ${JSON.stringify(session)}`);
     await storage.set("last_fm_session", {
       session_key: session.key,
       user: session.name,
     });
+    logger.info(`Saved session key: ${session.key}`);
     return {
       type: "AUTHENTICATE",
       success: true,
@@ -38,8 +45,16 @@ export async function authenticate(
   }
 }
 
-async function getLastFmSession(authenticator: LastFmAuthenticator) {
+async function getLastFmSession(
+  logger: Logger,
+  authenticator: LastFmAuthenticator,
+) {
   const authToken = await authenticator.authenticate();
-  const { session } = await getSession({ authToken });
-  return session;
+  try {
+    const { session } = await getSession({ authToken });
+    return session;
+  } catch (error: unknown) {
+    logger.error(error);
+    throw new Error("Error while getting lastFmSession");
+  }
 }
