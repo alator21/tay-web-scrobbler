@@ -3,9 +3,9 @@ import { Parser } from "../Parser.ts";
 import { queryElement } from "../utils.ts";
 
 export class YtMusicParser implements Parser {
-  hasSong(): boolean {
+  hasSong(parent: HTMLElement): boolean {
     const element = queryElement(
-      document,
+      parent,
       HTMLElement,
       "yt-formatted-string.title.ytmusic-player-bar",
     );
@@ -15,19 +15,19 @@ export class YtMusicParser implements Parser {
     }
     return content.length > 0;
   }
-  isPlaying(): boolean {
-    const element = queryElement(document, HTMLElement, "#play-pause-button");
+  isPlaying(parent: HTMLElement): boolean {
+    const element = queryElement(parent, HTMLElement, "#play-pause-button");
     return element.title === "Pause";
   }
-  songPosition(): number {
-    return this.parseTimeInfo().current;
+  songPosition(parent: HTMLElement): number {
+    return this.parseTimeInfo(parent).current;
   }
-  songTotalDuration(): number {
-    return this.parseTimeInfo().total;
+  songTotalDuration(parent: HTMLElement): number {
+    return this.parseTimeInfo(parent).total;
   }
-  title(): string {
+  title(parent: HTMLElement): string {
     const element = queryElement(
-      document,
+      parent,
       HTMLElement,
       "yt-formatted-string.title.ytmusic-player-bar",
     );
@@ -37,9 +37,9 @@ export class YtMusicParser implements Parser {
     }
     return title;
   }
-  artist(): string {
+  artist(parent: HTMLElement): string {
     const element = queryElement(
-      document,
+      parent,
       HTMLAnchorElement,
       "span.subtitle.ytmusic-player-bar>yt-formatted-string>a",
     );
@@ -49,9 +49,9 @@ export class YtMusicParser implements Parser {
     }
     return artist;
   }
-  album(): string {
+  album(parent: HTMLElement): string {
     const element = queryElement(
-      document,
+      parent,
       HTMLAnchorElement,
       "yt-formatted-string.byline.style-scope.ytmusic-player-bar > a:last-of-type",
     );
@@ -61,17 +61,17 @@ export class YtMusicParser implements Parser {
     }
     return album;
   }
-  coverUrl(): string {
+  coverUrl(parent: HTMLElement): string {
     const element = queryElement(
-      document,
+      parent,
       HTMLImageElement,
       "div.thumbnail-image-wrapper.ytmusic-player-bar>img",
     );
     return element.src;
   }
 
-  private parseTimeInfo() {
-    const element = queryElement(document, HTMLSpanElement, "span.time-info");
+  private parseTimeInfo(parent: HTMLElement) {
+    const element = queryElement(parent, HTMLSpanElement, "span.time-info");
     const content = element.textContent; // '0:20 / 3:41'
     if (content === null) {
       throw new ParseError();

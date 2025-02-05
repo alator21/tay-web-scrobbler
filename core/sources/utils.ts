@@ -1,5 +1,5 @@
 export function queryElement<T extends typeof Element>(
-  container: Document | Element,
+  container: Element,
   type: T,
   selector: string,
 ): InstanceType<T> {
@@ -12,10 +12,7 @@ export function queryElement<T extends typeof Element>(
   return el as InstanceType<T>;
 }
 
-function checkedQuerySelector(
-  parent: Element | Document,
-  selector: string,
-): Element {
+function checkedQuerySelector(parent: Element, selector: string): Element {
   const el = parent.querySelector(selector);
   if (!el) {
     throw new Error(`Selector ${selector} didn't match any elements.`);

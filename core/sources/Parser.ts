@@ -1,23 +1,23 @@
 export interface Parser {
-  hasSong(): boolean;
+  hasSong(parent: HTMLElement): boolean;
 
-  isPlaying(): boolean;
+  isPlaying(parent: HTMLElement): boolean;
 
   /*
    * Current second(progress) of the song  [ **01:20** / 03:05 ]
    * */
-  songPosition(): number;
+  songPosition(parent: HTMLElement): number;
 
   /*
    * How long the song lasts in total(seconds) [ 01:20 / **03:05** ]
    * */
-  songTotalDuration(): number;
+  songTotalDuration(parent: HTMLElement): number;
 
-  title(): string;
+  title(parent: HTMLElement): string;
 
-  artist(): string;
+  artist(parent: HTMLElement): string;
 
-  album(): string;
+  album(parent: HTMLElement): string;
 
-  coverUrl(): string;
+  coverUrl(parent: HTMLElement): string;
 }

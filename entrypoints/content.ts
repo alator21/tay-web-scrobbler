@@ -19,19 +19,26 @@ export default defineContentScript({
     const parser: Parser = new YtMusicParser();
 
     async function sendCurrentPlayer() {
+      const domSnapshot = document.querySelector("body")!;
       try {
         const player = {
-          hasSong: parser.hasSong(),
-          isPlaying: parser.isPlaying(),
+          hasSong: parser.hasSong(domSnapshot),
+          isPlaying: parser.isPlaying(domSnapshot),
           song: {
-            artist: parser.artist(),
-            album: parser.album(),
-            coverUrl: parser.coverUrl(),
-            position: parser.songPosition(),
-            totalDuration: parser.songTotalDuration(),
-            title: parser.title(),
+            artist: parser.artist(domSnapshot),
+            album: parser.album(domSnapshot),
+            coverUrl: parser.coverUrl(domSnapshot),
+            position: parser.songPosition(domSnapshot),
+            totalDuration: parser.songTotalDuration(domSnapshot),
+            title: parser.title(domSnapshot),
           },
         };
+        if (player.song.totalDuration < player.song.position) {
+          logger.warn(
+            "Player contained current position greater than the total duration",
+          );
+          return;
+        }
         logger.debug({ player });
         if (!player.isPlaying) {
           return;
