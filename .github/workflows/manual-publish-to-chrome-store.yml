@@ -20,14 +20,15 @@ jobs:
       - name: Zip extensions
         run: |
           bun zip
+        env:
+          VITE_LAST_FM_API_KEY: ${{ secrets.LAST_FM_API_KEY }}
+          VITE_LAST_FM_SHARED_SECRET: ${{ secrets.LAST_FM_SHARED_SECRET }}
 
       - name: Submit to stores
         run: |
           bun wxt submit \
             --chrome-zip .output/*-chrome.zip
         env:
-          VITE_LAST_FM_API_KEY: ${{ secrets.LAST_FM_API_KEY }}
-          VITE_LAST_FM_SHARED_SECRET: ${{ secrets.LAST_FM_SHARED_SECRET }}
           CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
           CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
           CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
