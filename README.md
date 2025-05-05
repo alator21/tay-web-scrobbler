@@ -10,6 +10,12 @@
 
 - Logo Icon: https://icons8.com/icon/11953/modern-art
 
+
+## Available at
+
+- [Chrome](https://chromewebstore.google.com/detail/tay-web-scrobbler/dodeagheafpgcfcblodiacfjbcfnfgcj?pli=1)
+- [Mozilla](https://addons.mozilla.org/en-US/firefox/addon/tay-web-scrobbler/)
+
 ## For the source code reviewers(folks at Mozilla)
 
 ### Overview
