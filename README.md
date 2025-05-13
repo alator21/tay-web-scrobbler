@@ -39,8 +39,10 @@ You first need to create a last.fm application(https://www.last.fm/api/account/c
 - For the folks at mozilla a sample application has already been created and the credentials to it will be sent to use
   via a secure channel.
   Create a `.env`(see `.env.sample` for the format of it) file in the root of the project and add the credentials of the application.
+
   Install the required packages
 - `npm install`
+
   Start the application in DEV mode
 - `npm run dev:firefox --mv2`
 
