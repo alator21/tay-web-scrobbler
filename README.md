@@ -10,7 +10,6 @@
 
 - Logo Icon: https://icons8.com/icon/11953/modern-art
 
-
 ## Available at
 
 - [Chrome](https://chromewebstore.google.com/detail/tay-web-scrobbler/dodeagheafpgcfcblodiacfjbcfnfgcj?pli=1)
@@ -41,9 +40,11 @@ You first need to create a last.fm application(https://www.last.fm/api/account/c
   Create a `.env`(see `.env.sample` for the format of it) file in the root of the project and add the credentials of the application.
 
   Install the required packages
+
 - `npm install`
 
   Start the application in DEV mode
+
 - `npm run dev:firefox --mv2`
 
 ### How to use the extension
