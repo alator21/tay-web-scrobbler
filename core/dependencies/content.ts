@@ -4,7 +4,17 @@ import { CurrentSongPersistor } from "@/core/domain/implementation/CurrentSongPe
 import { BrowserStorage } from "@/core/domain/implementation/BrowserStorage.ts";
 import log from "loglevel";
 import { initializeLastFmApi } from "@alator21/lastfm";
+import { StorageOptions } from "../domain/Storage";
 
+function applyOptions({
+  scrobbleThreshold,
+  scrobblingEnabled,
+  logLevel,
+}: StorageOptions) {
+  songListenedDetector.modifyEnabledStatus(scrobblingEnabled);
+  songListenedDetector.updateThreshold(scrobbleThreshold);
+  logger.setLevel(logLevel);
+}
 initializeLastFmApi(
   import.meta.env.VITE_LAST_FM_API_KEY,
   import.meta.env.VITE_LAST_FM_SHARED_SECRET,
@@ -15,14 +25,19 @@ logger.setLevel("info");
 export const songListenedDetector = new SongListenedDetector(true, 0.7);
 export const songChangedDetector = new SongChangedDetector();
 export const currentSongPersistor = new CurrentSongPersistor(5000);
+
 storage.addChangeListener(
   "options",
   ({ scrobblingEnabled, scrobbleThreshold, logLevel }) => {
     logger.info(`Options changed`);
     logger.info({ scrobblingEnabled, scrobbleThreshold, logLevel });
-
-    songListenedDetector.modifyEnabledStatus(scrobblingEnabled);
-    songListenedDetector.updateThreshold(scrobbleThreshold);
-    logger.setLevel(logLevel);
+    applyOptions({ scrobbleThreshold, scrobblingEnabled, logLevel });
   },
 );
+
+storage.get("options").then((options) => {
+  if (!options) {
+    return;
+  }
+  applyOptions(options);
+});
