@@ -16,8 +16,9 @@ export class YtMusicParser implements Parser {
     return content.length > 0;
   }
   isPlaying(parent: HTMLElement): boolean {
-    const element = queryElement(parent, HTMLElement, "#play-pause-button");
-    return element.title === "Pause";
+    const title = this.title(parent);
+    // When a song is playing, the tab title is prefixed with the song name.
+    return title.length > 0 && document.title.startsWith(title);
   }
   songPosition(parent: HTMLElement): number {
     return this.parseTimeInfo(parent).current;
