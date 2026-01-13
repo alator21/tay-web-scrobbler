@@ -3,6 +3,29 @@ import { Parser } from "../Parser.ts";
 import { queryElement } from "../utils.ts";
 
 export class YtMusicParser implements Parser {
+  private static readonly PAUSE_TRANSLATIONS = [
+    "pause",              // English
+    "παύση",              // Greek
+    "pausa",              // Spanish / Italian / Portuguese
+    "mettre en pause",    // French
+    "pause vidéo",        // French (alt)
+    "anhalten",           // German
+    "pauze",              // Dutch
+    "пауза",              // Russian / Bulgarian
+    "pauza",              // Polish / Czech / Slovak / Croatian
+    "szünet",             // Hungarian
+    "一時停止",           // Japanese
+    "暂停",               // Chinese (Simplified)
+    "暫停",               // Chinese (Traditional)
+    "일시중지",           // Korean
+    "إيقاف مؤقت",         // Arabic
+    "השהה",               // Hebrew
+    "duraklat",           // Turkish
+    "tạm dừng",           // Vietnamese
+    "หยุดชั่วคราว",          // Thai
+    "pauskan",            // Indonesian
+    "hentikan sementara", // Indonesian (alt)
+  ].map(t => t.toLowerCase());
   hasSong(parent: HTMLElement): boolean {
     const element = queryElement(
       parent,
@@ -16,9 +39,11 @@ export class YtMusicParser implements Parser {
     return content.length > 0;
   }
   isPlaying(parent: HTMLElement): boolean {
-    const title = this.title(parent);
-    // When a song is playing, the tab title is prefixed with the song name.
-    return title.length > 0 && document.title.startsWith(title);
+    const element = queryElement(parent, HTMLElement, "#play-pause-button");
+    const title = element.title;
+    const normalized = title.trim().toLowerCase();
+    return YtMusicParser.PAUSE_TRANSLATIONS.some(pause =>
+      pause.length > 2 && normalized.includes(pause));
   }
   songPosition(parent: HTMLElement): number {
     return this.parseTimeInfo(parent).current;
